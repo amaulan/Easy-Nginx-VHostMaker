@@ -42,8 +42,10 @@ class NginxVhostCreator
 
 	public function getConfigData()
 	{
-		$word = ['server','port','path'];
-		$data = [];
+		$file     = '/etc/hosts';
+		$content  = file_get_contents($file);
+		$word     = ['server','port','path'];
+		$data     = [];
 		for ($i=0; $i < count($word); $i++) { 
 
 			try {
@@ -54,6 +56,10 @@ class NginxVhostCreator
 					case 'server':
 						if (preg_match("/(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]/", $line)) {
 							$data[$word[$i]] = $line;
+							$pattern         = "/".$line."/"; 
+							if (!preg_match($pattern , $content)){
+								exec("echo '127.0.0.1      ". $line ."'  >> /etc/hosts");
+							}
 						}
 						else{
 							die($this->color("Name Server Invalid !!!!!!!!!\n","l_red"));
